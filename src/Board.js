@@ -32,7 +32,7 @@ class Board extends Component {
   static defaultProps = {
     nrows: 5,
     ncols: 5,
-    chanceLightStartsOn: 0.3,
+    chanceLightStartsOn: 0.25
   };
   constructor(props) {
     super(props);
@@ -40,7 +40,7 @@ class Board extends Component {
     // TODO: set initial state
     this.state = {
       hasWon: false,
-      board: this.createBoard(),
+      board: this.createBoard()
     };
   }
 
@@ -62,7 +62,6 @@ class Board extends Component {
   /** handle changing a cell: update board & determine if winner */
 
   flipCellsAround(coord) {
-    console.log(coord);
     let { ncols, nrows } = this.props;
     let board = this.state.board;
     let [y, x] = coord.split("-").map(Number);
@@ -74,18 +73,22 @@ class Board extends Component {
         board[y][x] = !board[y][x];
       }
     }
-
     // TODO: flip this cell and the cells around it
+    flipCell(y, x); //Flip initial cell
+    flipCell(y, x - 1); //flip left
+    flipCell(y, x + 1); //flip right
+    flipCell(y - 1, x); //flip below
+    flipCell(y + 1, x); //flip above
 
     // win when every cell is turned off
     // TODO: determine is the game has been won
+    let hasWon = board.every(row => row.every(cell => !cell));
 
-    // this.setState({ board, hasWon });
+    this.setState({ board: board, hasWon: hasWon });
   }
 
   /** Render game board or winning message. */
-
-  render() {
+  makeTable() {
     let tblBoard = [];
     for (let y = 0; y < this.props.nrows; y++) {
       let row = [];
@@ -102,14 +105,30 @@ class Board extends Component {
       tblBoard.push(<tr key={y}>{row}</tr>);
     }
     return (
-      <table className="Board">
+      <table className='Board'>
         <tbody>{tblBoard}</tbody>
       </table>
     );
-    // if the game is won, just show a winning msg & render nothing else
-    // TODO
-    // make table board
-    // TODO
+  }
+  render() {
+    return (
+      <div>
+        {this.state.hasWon ? (
+          <div className='winner'>
+            <span className='neon-orange'>YOU</span>
+            <span className='neon-blue'>WIN!</span>
+          </div>
+        ) : (
+          <div>
+            <div className='Board-title'>
+              <div className='neon-orange'>Lights</div>
+              <div className='neon-blue'>Out</div>
+            </div>
+            {this.makeTable()}
+          </div>
+        )}
+      </div>
+    );
   }
 }
 
